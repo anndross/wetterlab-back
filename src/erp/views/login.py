@@ -1,29 +1,31 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from json import loads, dumps
 from core.mongodb import erp_connection
-from core.utils import parse_bson_single
+from core.utils import parse_bson
 from core.utils.jwt import encode_jwt, decode_jwt
-
+from ..serializers import LoginSerializer
 
 class LoginView(APIView):
 
     def post(self, request):
-        if 'email' not in request.data:
-            return Response({'error': 'the email field is mandatory'}, status=502)
+        login_serializer = LoginSerializer(data=request.data)
 
-        email = request.data['email']
+        if not login_serializer.is_valid(): 
+            return Response(login_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        customers = erp_connection.get_collection('customers')
+        customer = erp_connection.get_collection('customers').find_one({
+            "email": login_serializer.validated_data.get('email')
+        })
 
-        found_customer = customers.find_one({'email': email})
+        if not customer: 
+            return Response({ "error": "Customer with this e-mail was not found" }, status=status.HTTP_400_BAD_REQUEST)
+       
+        customer_json = parse_bson(customer)
+        auth_token = encode_jwt(customer_json)
 
-        if found_customer is None:
-            return Response({'message': 'user not found'}, status=202)
-        else:
-            found_customer_json = parse_bson_single(found_customer)
-             
-            token = encode_jwt(found_customer_json, 30)
-            print(token)
-
-            return Response({'message': 'user found', 'token': token}, status=200)
+        return Response({
+            "message": "Authenticated successfully", 
+            "data": auth_token
+        })

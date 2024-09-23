@@ -10,6 +10,7 @@ def parse_bson_list(bson_array):
     return [parse_bson_single(bson) for bson in bson_array]
 
 def parse_bson(bson):
+    if not bson: return None
     is_single_bson = isinstance(bson, dict)
     if(is_single_bson):
         return parse_bson_single(bson)
