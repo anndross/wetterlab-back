@@ -12,15 +12,15 @@ class LoginView(APIView):
     def post(self, request):
         login_serializer = LoginSerializer(data=request.data)
 
-        if not login_serializer.is_valid(): 
-            return Response(login_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not login_serializer.is_valid():
+            return Response({ "error": login_serializer.errors['email'][0] }, status=status.HTTP_400_BAD_REQUEST)
 
         customer = erp_connection.get_collection('customers').find_one({
             "email": login_serializer.validated_data.get('email')
         })
 
         if not customer: 
-            return Response({ "error": "Customer with this e-mail was not found" }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({ "error": "Não foi encontrado nenhum usuário com este email" }, status=status.HTTP_400_BAD_REQUEST)
        
         customer_json = parse_bson(customer)
         auth_token = encode_jwt(customer_json)
