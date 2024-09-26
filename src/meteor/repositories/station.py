@@ -1,44 +1,69 @@
 from core.mongodb import meteor_connection
 from core.utils import parse_bson
-import time
-
+import unicodedata
 
 class StationRepository:
     def __init__(self): 
         self.collection = meteor_connection.get_collection('stations')
         # self.collection.create_index([("position", "2dsphere")])
 
-    def test(self, coordinates, date_from, date_to): 
+    def transform_string(self, string):
+        # Remover acentos
+        text_without_accent = ''.join(
+            c for c in unicodedata.normalize('NFKD', string) 
+            if unicodedata.category(c) != 'Mn'
+        )
+        # Converter para maiúsculas
+        return text_without_accent.upper()
+
+    def test(self, coordinates, date_from, date_to, location=None): 
         # stations = self.collection.find().limit(1000)
         # coordinates = [-47.9258346557617, -15.78944396972656]
         # coordinates = [-46.11916732788086, -17.78472137451172]
         # dist 100.000 - 2.74s
         # mindist 10.000 - 2.74s
-        max_distance = 10000
-        query = {
-            'position': {
-                '$near': {
-                    '$geometry': {
-                        'type': 'Point',
-                        'coordinates': coordinates
-                    },
-                    '$maxDistance': max_distance
-                }
-            },
-            'datetime': {
-                '$gte': date_from,  # Data inicial (>=)
-                '$lte': date_from     # Data final (<=)
-            }
-        }
+        max_distance = 50000
 
-        stations = self.collection.find(query).limit(200)
-        stations = parse_bson(stations)
+        stations = []
+
+        if location is None:
+            query_by_coordinates = {
+                'position': {
+                    '$near': {
+                        '$geometry': {
+                            'type': 'Point',
+                            'coordinates': coordinates
+                        },
+                        '$maxDistance': max_distance
+                    }
+                },
+                'datetime': {
+                    '$gte': date_from,  # Data inicial (>=)
+                    '$lte': date_to     # Data final (<=)
+                }
+            }
+
+            stations = self.collection.find(query_by_coordinates).limit(50).sort('datetime', 1)
+            stations = parse_bson(stations)
+
+        else:
+            query_by_location = {
+                'location': self.transform_string(string=location),
+                'datetime': {
+                    '$gte': date_from,  # Data inicial (>=)
+                    '$lte': date_to     # Data final (<=)
+                }
+            }
+
+            stations = self.collection.find(query_by_location).limit(50).sort('datetime', 1)
+            stations = parse_bson(stations)
 
         print('stations ->', stations, len(stations))
         # p = parse_bson(stations)
         # print('stations.len ->', len(p))
 
         return stations
+
 
     def get_stations(self, query, options): 
         query_cursor = self.collection.find(query)

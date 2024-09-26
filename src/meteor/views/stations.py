@@ -11,25 +11,26 @@ class StationsView(APIView):
         longitude = request.query_params.get('longitude')
         latitude = request.query_params.get('latitude')
 
+        location = request.query_params.get('location')
 
         date_from_array = request.query_params.get('from').split('-')
         date_to_array = request.query_params.get('to').split('-')
 
-
         date_from = datetime(int(date_from_array[0]), int(date_from_array[1]), int(date_from_array[2]))
         date_to = datetime(int(date_to_array[0]), int(date_to_array[1]), int(date_to_array[2]))
-
 
         # The order matters! Long [1] - Lat [0]
         coordinates = parse_coordinates([longitude, latitude])
 
-        if not coordinates[1] or not coordinates[0]:
-            return Response(
-                { 'message': '`latitude` and `longitude` is a required query parameter'},
-                status=400
-            )
+        # if not coordinates[1] or not coordinates[0]:
+        #     return Response(
+        #         { 'message': '`latitude` and `longitude` is a required query parameter'},
+        #         status=400
+        #     )
         
-        stations = station_repository.test(coordinates, date_from, date_to) or []
+        stations = station_repository.test(coordinates, date_from, date_to, location) or []
+        print(date_from, date_to)
+
         return Response(stations)
         station = station_repository.find_closest_station(coordinates)
 
