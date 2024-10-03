@@ -3,9 +3,9 @@ from core.utils import parse_bson
 import unicodedata
 import math
 
-class StationRepository:
+class ModelsRepository:
     def __init__(self): 
-        self.collection = meteor_connection.get_collection('stations')
+        self.collection = meteor_connection.get_collection('models')
         # self.collection.create_index([("position", "2dsphere")])
 
     def transform_string(self, string):
@@ -16,74 +16,6 @@ class StationRepository:
         )
         # Converter para maiúsculas
         return text_without_accent.upper()
-
-
-    def test2(self, coordinates, date_from, date_to):
-        print('coordinates', coordinates)
-
-        target_latitude = coordinates[1]
-        target_longitude = coordinates[0]
-
-
-        geospatial_results = parse_bson(self.collection.find({
-            'position': {
-                '$near': {
-                    '$geometry': {
-                        'type': 'Point',
-                        'coordinates': coordinates  # [longitude, latitude]
-                    },
-                    '$maxDistance': 1000  # Distância máxima em metros
-                }
-            },
-            'datetime': {
-                '$gte': date_from,  # Data inicial (>=)
-                '$lte': date_to     # Data final (<=)
-            }
-        }).limit(50).sort('datetime', 1))
-
-        print('geospatial_results', geospatial_results)
-
-        # Verifique se resultados foram encontrados
-        if geospatial_results:
-            return geospatial_results
-
-        # Se não houver resultados, extraia a parte inteira e a parte decimal
-        integer_lat = int(target_latitude)
-        decimal_lat = str(abs(target_latitude)).split('.')[1]  # Captura a parte decimal da latitude
-        integer_long = int(target_longitude)
-        decimal_long = str(abs(target_longitude)).split('.')[1]  # Captura a parte decimal da longitude
-
-        # Cria listas de buscas com base nas partes decimais
-        lat_searches = []
-        long_searches = []
-        
-        # Procura pela parte decimal com menos precisão para a latitude
-        for i in range(len(decimal_lat)):
-            new_decimal = decimal_lat[:i] + '0' * (len(decimal_lat) - i)  # Completa com zeros
-            new_latitude = float(f"{integer_lat}.{new_decimal}") * (-1 if target_latitude < 0 else 1)
-            lat_searches.append(new_latitude)
-
-        # Procura pela parte decimal com menos precisão para a longitude
-        for i in range(len(decimal_long)):
-            new_decimal = decimal_long[:i] + '0' * (len(decimal_long) - i)  # Completa com zeros
-            new_longitude = float(f"{integer_long}.{new_decimal}") * (-1 if target_longitude < 0 else 1)
-            long_searches.append(new_longitude)
-
-        # Realiza a busca com as latitudes e longitudes geradas
-        for lat_search in lat_searches:
-            for long_search in long_searches:
-                results = parse_bson(self.collection.find({
-                    'position.coordinates.0': long_search,
-                    'position.coordinates.1': lat_search,
-                    'datetime': {
-                        '$gte': date_from,  # Data inicial (>=)
-                        '$lte': date_to     # Data final (<=)
-                    }
-                }).limit(50).sort('datetime', 1))
-                if results:
-                    return results
-
-        return []
 
 
     def convert_none_nan_to_string(self, data):
@@ -100,14 +32,14 @@ class StationRepository:
             return data  # Mantém o valor original para outros tipos
 
     def test(self, coordinates, date_from, date_to, location=None): 
-        # stations = self.collection.find().limit(1000)
+        # models = self.collection.find().limit(1000)
         # coordinates = [-47.9258346557617, -15.78944396972656]
         # coordinates = [-46.11916732788086, -17.78472137451172]
         # dist 100.000 - 2.74s
         # mindist 10.000 - 2.74s
-        max_distance = 50000
+        max_distance = 20000
 
-        stations = []
+        models = []
 
         if location is None:
             query_by_coordinates = {
@@ -120,43 +52,40 @@ class StationRepository:
                         '$maxDistance': max_distance
                     }
                 },
-                'datetime': {
+                'time': {
                     '$gte': date_from,  # Data inicial (>=)
                     '$lte': date_to     # Data final (<=)
                 }
             }
 
-            stations = self.convert_none_nan_to_string(parse_bson(self.collection.find(query_by_coordinates).limit(50).sort('datetime', 1)))
+            models = self.convert_none_nan_to_string(parse_bson(self.collection.find(query_by_coordinates).limit(50).sort('time', 1)))
 
-            if len(stations) > 0:
-                stations = parse_bson(stations)
-
+            # print('query_by_coordinates', query_by_coordinates, parse_bson(self.collection.find(query_by_location).limit(50).sort('time', 1)))
+            
         else:
             query_by_location = {
                 'location': self.transform_string(string=location),
-                'datetime': {
+                'time': {
                     '$gte': date_from,  # Data inicial (>=)
                     '$lte': date_to     # Data final (<=)
                 }
             }
 
-            stations = self.convert_none_nan_to_string(parse_bson(self.collection.find(query_by_location).limit(50).sort('datetime', 1)))
+            # print('query_by_location', query_by_location, parse_bson(self.collection.find(query_by_location).limit(50).sort('time', 1)))
+            models = self.convert_none_nan_to_string(parse_bson(self.collection.find(query_by_location).limit(50).sort('time', 1)))
 
-            if len(stations) > 0:
-                stations = parse_bson(stations)
+        # print('models ->', models, len(models))
+        # p = parse_bson(models)
+        # print('models.len ->', len(p))
 
-        print('stations ->', stations, len(stations))
-        # p = parse_bson(stations)
-        # print('stations.len ->', len(p))
-
-        return stations
+        return parse_bson(models)
 
 
-    def get_stations(self, query, options): 
+    def get_models(self, query, options): 
         query_cursor = self.collection.find(query)
         if options.get('limit'): query_cursor = query_cursor.limit(options.get('limit'))
-        stations_parsed = parse_bson(query_cursor)
-        return stations_parsed 
+        models_parsed = parse_bson(query_cursor)
+        return models_parsed 
 
     def get_station_by_exact_coordinates(self, coordinates):
         # Tenta buscar uma estação pela coordenada exata
@@ -216,7 +145,7 @@ class StationRepository:
         # 3. Se não encontrar nenhuma estação, retorna None ou uma mensagem
         return None
 
-station_repository = StationRepository()
+models_repository = ModelsRepository()
 
 # from core.mongodb import meteor_connection
 # from core.utils import parse_bson
@@ -224,7 +153,7 @@ station_repository = StationRepository()
 
 # class StationRepository:
 #     def __init__(self): 
-#         self.collection = meteor_connection.get_collection('stations')
+#         self.collection = meteor_connection.get_collection('models')
 
 #     def calculate_distance_haversine(self, lat1, lon1, lat2, lon2):
 #         # Raio médio da Terra em quilômetros
@@ -245,11 +174,11 @@ station_repository = StationRepository()
 #         distancia = R * c
 #         return distancia
 
-#     def filter_data_by_proximity(self, stations_data, lat_central, lon_central, raio_km):
+#     def filter_data_by_proximity(self, models_data, lat_central, lon_central, raio_km):
 #         # Função para filtrar os dados com base na proximidade a uma coordenada central
 #         results = []
 
-#         for data in stations_data:
+#         for data in models_data:
 #             lon, lat = data['position']['coordinates'][1], data['position']['coordinates'][0]
 #             distancia = self.calculate_distance_haversine(lat_central, lon_central, lat, lon)
 
@@ -264,7 +193,7 @@ station_repository = StationRepository()
 # raio_km = 500  # Raio de 500 km
 
 # # Chamando a função para filtrar os dados
-# resultado_filtrado = filtrar_dados_por_proximidade(stations_data, lat_central, lon_central, raio_km)
+# resultado_filtrado = filtrar_dados_por_proximidade(models_data, lat_central, lon_central, raio_km)
 
 # # Exibindo os resultados
     

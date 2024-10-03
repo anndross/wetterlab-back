@@ -1,12 +1,10 @@
-from core.mongodb import meteor_connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from ..repositories.station import station_repository 
-from core.utils import parse_coordinates 
+from ..repositories.models import models_repository
 from datetime import datetime
+from core.utils import parse_coordinates 
 
-class StationsView(APIView):
-
+class Models(APIView):
     def get(self, request):
         longitude = request.query_params.get('longitude')
         latitude = request.query_params.get('latitude')
@@ -28,17 +26,10 @@ class StationsView(APIView):
         #         status=400
         #     )
         
-        stations = station_repository.test(coordinates, date_from, date_to, location) or []
-        # print(date_from, date_to)
+        models = models_repository.test(coordinates, date_from, date_to, location) or []
 
-        return Response(stations)
-        station = station_repository.find_closest_station(coordinates)
+        
+        print('models---------------', models, date_from, date_to, '---------------models')
 
+        return Response(models)
 
-        if not station:
-            return Response(
-                { 'message': 'Station not found for the provided coordinate' },
-                status=404
-            )
-
-        return Response(station)
