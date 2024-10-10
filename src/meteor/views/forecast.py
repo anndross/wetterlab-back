@@ -1,12 +1,11 @@
-from core.mongodb import meteor_connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from ..repositories.station import station_repository 
-from core.utils import parse_coordinates 
 from datetime import datetime
+from core.utils import parse_coordinates 
+from ..repositories.station import station_repository 
+from ..repositories.models import models_repository
 
-class StationsView(APIView):
-
+class Forecast(APIView):
     def get(self, request):
         longitude = request.query_params.get('longitude')
         latitude = request.query_params.get('latitude')
@@ -23,5 +22,7 @@ class StationsView(APIView):
         coordinates = parse_coordinates([longitude, latitude])
         
         stations = station_repository.test(coordinates, date_from, date_to, service) or []
+        models = models_repository.test(coordinates, date_from, date_to, service) or []
 
-        return Response(stations)
+        return Response([stations, models])
+      

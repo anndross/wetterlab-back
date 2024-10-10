@@ -9,7 +9,7 @@ class Models(APIView):
         longitude = request.query_params.get('longitude')
         latitude = request.query_params.get('latitude')
 
-        location = request.query_params.get('location')
+        service = request.query_params.get('service')
 
         date_from_array = request.query_params.get('from').split('-')
         date_to_array = request.query_params.get('to').split('-')
@@ -20,16 +20,7 @@ class Models(APIView):
         # The order matters! Long [1] - Lat [0]
         coordinates = parse_coordinates([longitude, latitude])
 
-        # if not coordinates[1] or not coordinates[0]:
-        #     return Response(
-        #         { 'message': '`latitude` and `longitude` is a required query parameter'},
-        #         status=400
-        #     )
-        
-        models = models_repository.test(coordinates, date_from, date_to, location) or []
-
-        
-        print('models---------------', models, date_from, date_to, '---------------models')
+        models = models_repository.test(coordinates, date_from, date_to, service) or []
 
         return Response(models)
 
