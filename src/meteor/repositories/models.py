@@ -54,6 +54,7 @@ class ModelsRepository:
 
         target_data = {
             service: True,
+            'time': True
         }
 
         found_and_filtered_data = self.collection.find(query_by_coordinates, target_data).limit(200).sort('datetime', 1)

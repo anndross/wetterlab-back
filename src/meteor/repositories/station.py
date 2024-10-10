@@ -54,20 +54,21 @@ class StationRepository:
 
         target_data = {
             service: True,
+            'datetime': True
         }
 
         found_and_filtered_data = self.collection.find(query_by_coordinates, target_data).limit(200).sort('datetime', 1)
 
         stations = self.convert_none_nan_to_string(parse_bson(found_and_filtered_data))
 
-        pd_data = found_and_filtered_data
+        # pd_data = found_and_filtered_data
 
-        df = pd.DataFrame(list(pd_data))
+        # df = pd.DataFrame(list(pd_data))
 
-        # # Calcular a média de 't.value'
-        # mean_value = df[service].apply(lambda x: x['quality']).mean()
+        # # # Calcular a média de 't.value'
+        # # mean_value = df[service].apply(lambda x: x['quality']).mean()
 
-        print(df)
+        # print(df)
 
         print('stations', stations)
         return stations
