@@ -31,10 +31,8 @@ class StationRepository:
         else:
             return data  # Mantém o valor original para outros tipos
 
-    def test(self, coordinates, date_from, date_to, service): 
+    def handle_data(self, coordinates, date_from, date_to, service, mean): 
         max_distance = 1000
-
-        stations = []
 
         query_by_coordinates = {
             'position': {
@@ -57,20 +55,28 @@ class StationRepository:
             'datetime': True
         }
 
-        found_and_filtered_data = self.collection.find(query_by_coordinates, target_data).limit(200).sort('datetime', 1)
+        cursor_data = self.collection.find(query_by_coordinates, target_data).limit(5000).sort('datetime', 1)
 
-        stations = self.convert_none_nan_to_string(parse_bson(found_and_filtered_data))
+        service_value = f'{service}_value'
+        
+        data = list(cursor_data)
+ 
+        if len(data) == 0 or service not in data[0]: return []
 
-        # pd_data = found_and_filtered_data
+        df = pd.DataFrame(data)
+        
+        df['datetime'] = pd.to_datetime(df['datetime'])
 
-        # df = pd.DataFrame(list(pd_data))
+        df[service_value] = pd.to_numeric(df[service].apply(lambda x: x['value']), errors='coerce')        
+        df[service_value].fillna(0, inplace=True)
 
-        # # # Calcular a média de 't.value'
-        # # mean_value = df[service].apply(lambda x: x['quality']).mean()
+        df.set_index('datetime', inplace=True)
 
-        # print(df)
+        mean_by_interval = df[service_value].resample(f'{mean}D').mean()
+        
+        json_data = mean_by_interval.reset_index().rename(columns={'datetime': 'date', service_value: 'value'}).to_dict(orient='records')
 
-        print('stations', stations)
-        return stations
+        return json_data
+
 
 station_repository = StationRepository()

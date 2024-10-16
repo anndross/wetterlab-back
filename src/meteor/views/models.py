@@ -10,6 +10,7 @@ class Models(APIView):
         latitude = request.query_params.get('latitude')
 
         service = request.query_params.get('service')
+        mean = request.query_params.get('mean')
 
         date_from_array = request.query_params.get('from').split('-')
         date_to_array = request.query_params.get('to').split('-')
@@ -20,7 +21,7 @@ class Models(APIView):
         # The order matters! Long [1] - Lat [0]
         coordinates = parse_coordinates([longitude, latitude])
 
-        models = models_repository.test(coordinates, date_from, date_to, service) or []
+        models = models_repository.handle_data(coordinates, date_from, date_to, service, mean) or []
 
         return Response(models)
 

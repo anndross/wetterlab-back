@@ -2,6 +2,7 @@ from core.mongodb import meteor_connection
 from core.utils import parse_bson
 import unicodedata
 import math
+import pandas as pd
 
 class ModelsRepository:
     def __init__(self): 
@@ -31,10 +32,8 @@ class ModelsRepository:
         else:
             return data  # Mantém o valor original para outros tipos
 
-    def test(self, coordinates, date_from, date_to, service): 
+    def handle_data(self, coordinates, date_from, date_to, service, mean): 
         max_distance = 1000
-
-        models = []
 
         query_by_coordinates = {
             'position': {
@@ -57,10 +56,27 @@ class ModelsRepository:
             'time': True
         }
 
-        found_and_filtered_data = self.collection.find(query_by_coordinates, target_data).limit(200).sort('datetime', 1)
+        cursor_data = self.collection.find(query_by_coordinates, target_data).limit(5000).sort('time', 1)
 
-        models = self.convert_none_nan_to_string(parse_bson(found_and_filtered_data))
-    
-        return models
+        service_value = f'{service}_value'
+        
+        data = list(cursor_data)
+
+        if len(data) == 0 or service not in data[0]: return []
+
+        df = pd.DataFrame(data)
+        
+        df['time'] = pd.to_datetime(df['time'])
+
+        df[service_value] = pd.to_numeric(df[service].apply(lambda x: x), errors='coerce')        
+        df[service_value].fillna(0, inplace=True)
+
+        df.set_index('time', inplace=True)
+        
+        mean_by_interval = df[service_value].resample(f'{mean}D').mean()
+        
+        json_data = mean_by_interval.reset_index().rename(columns={'time': 'date', service_value: 'value'}).to_dict(orient='records')
+
+        return json_data
 
 models_repository = ModelsRepository()
