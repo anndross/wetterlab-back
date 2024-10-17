@@ -58,9 +58,9 @@ class StationRepository:
         cursor_data = self.collection.find(query_by_coordinates, target_data).limit(5000).sort('datetime', 1)
 
         service_value = f'{service}_value'
-        
+
         data = list(cursor_data)
- 
+
         if len(data) == 0 or service not in data[0]: return []
 
         df = pd.DataFrame(data)

@@ -30,8 +30,7 @@ class Forecast(APIView):
         stationsLen = len(stations)
         modelsLen = len(models)
 
-
-        # cria um array de datas com base no array que veio com mais dados
+        # cria um array de datas com base no maior array
         dates = []
 
         def getDates(data):
