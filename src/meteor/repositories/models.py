@@ -3,6 +3,7 @@ from core.utils import parse_bson
 import unicodedata
 import math
 import pandas as pd
+from datetime import date
 
 class ModelsRepository:
     def __init__(self): 
@@ -32,7 +33,7 @@ class ModelsRepository:
         else:
             return data  # Mantém o valor original para outros tipos
 
-    def handle_data(self, coordinates, date_from, date_to, service, mean): 
+    def handle_data(self, coordinates, date_from, date_to, service, mean, reftime): 
         max_distance = 1000
 
         query_by_coordinates = {
@@ -51,9 +52,15 @@ class ModelsRepository:
             }
         }
 
+        if isinstance(reftime, date): 
+            query_by_coordinates['ref_time'] = reftime
+
+
+        print(reftime, query_by_coordinates)
+
         target_data = {
             service: True,
-            'time': True
+            'time': True,
         }
 
         cursor_data = self.collection.find(query_by_coordinates, target_data).limit(5000).sort('time', 1)
@@ -61,11 +68,10 @@ class ModelsRepository:
         service_value = f'{service}_value'
         
         data = list(cursor_data)
-
+       
         if len(data) == 0 or service not in data[0]: return []
 
         df = pd.DataFrame(data)
-        
         df['time'] = pd.to_datetime(df['time'])
 
         df[service_value] = pd.to_numeric(df[service].apply(lambda x: x), errors='coerce')        
@@ -75,7 +81,7 @@ class ModelsRepository:
         
         mean_by_interval = df[service_value].resample(f'{mean}D').mean()
         
-        json_data = mean_by_interval.reset_index().rename(columns={'time': 'date', service_value: 'value'}).to_dict(orient='records')
+        json_data = mean_by_interval.reset_index().rename(columns={'time': 'date', service_value: 'value', 'ref_time': 'ref_time'}).to_dict(orient='records')
 
         return json_data
 

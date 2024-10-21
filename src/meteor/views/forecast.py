@@ -16,6 +16,11 @@ class Forecast(APIView):
         mean = request.query_params.get('mean')
         date_from = datetime(int(date_from_array[0]), int(date_from_array[1]), int(date_from_array[2]), 0, 0, 0)
         date_to = datetime(int(date_to_array[0]), int(date_to_array[1]), int(date_to_array[2]), 0, 0, 0)
+        reftime = request.query_params.get('reftime')
+
+        if reftime:  
+            reftime_array = request.query_params.get('reftime').split('-')
+            reftime = datetime(int(reftime_array[0]), int(reftime_array[1]), int(reftime_array[2]), int(reftime_array[3]), int(reftime_array[4]), int(reftime_array[5]))
 
         # a ordem é longitude e latitude
         coordinates = parse_coordinates([longitude, latitude])
@@ -24,7 +29,7 @@ class Forecast(APIView):
         stations = station_repository.handle_data(coordinates, date_from, date_to, service, mean) or []
 
         # pega os dados de models com base nos parâmetros
-        models = models_repository.handle_data(coordinates, date_from, date_to, service, mean) or []
+        models = models_repository.handle_data(coordinates, date_from, date_to, service, mean, reftime) or []
 
         # pega o tamanho de stations e models
         stationsLen = len(stations)
