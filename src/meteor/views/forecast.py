@@ -66,8 +66,84 @@ class Forecast(APIView):
                     'value': 0
                 })
 
-        return Response({
+        response_data = {
             'dates': dates, 
             'stations': stations + stations_filled_array, 
             'models': models + models_filled_array
-        })
+        }
+
+        mapped_stations = [
+            {
+                "x": [],
+                "y": []
+            },
+            {
+                "x": [],
+                "y": []
+            },
+            {
+                "x": [],
+                "y": []
+            }
+        ]
+        
+
+        def push_stations_axle_x_and_y(data): 
+            mapped_stations[0]['x'].append(data['date'])
+            mapped_stations[0]['y'].append(data['value'])
+
+            mapped_stations[1]['x'].append(data['date'])
+            if data['value'] == 0:
+                mapped_stations[1]['y'].append(data['value'])
+            else: 
+                mapped_stations[1]['y'].append(data['value'] / 1.2)
+
+            mapped_stations[2]['x'].append(data['date'])
+            if data['value'] == 0:
+                mapped_stations[2]['y'].append(data['value'])
+            else: 
+                mapped_stations[2]['y'].append(data['value'] * 1.2)
+
+
+
+        for data in response_data['stations']:
+            push_stations_axle_x_and_y(data)
+
+        mapped_models = [
+            {
+                "x": [],
+                "y": []
+            },
+            {
+                "x": [],
+                "y": []
+            },
+            {
+                "x": [],
+                "y": []
+            }
+        ]
+        def push_models_axle_x_and_y(data): 
+            mapped_models[0]['x'].append(data['date'])
+            mapped_models[0]['y'].append(data['value'])
+
+            mapped_models[1]['x'].append(data['date'])
+            if data['value'] == 0:
+                mapped_models[1]['y'].append(data['value'])
+            else: 
+                mapped_models[1]['y'].append(data['value'] / 1.2)
+
+            mapped_models[2]['x'].append(data['date'])
+            if data['value'] == 0:
+                mapped_models[2]['y'].append(data['value'])
+            else: 
+                mapped_models[2]['y'].append(data['value'] * 1.2)
+
+
+        for data in response_data['models']:
+            push_models_axle_x_and_y(data)
+
+        response_data['stations'] = mapped_stations
+        response_data['models'] = mapped_models
+
+        return Response(response_data)
