@@ -1,7 +1,7 @@
 from core.mongodb import meteor_connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from ..repositories.station import station_repository 
+from ..repositories.stations import station_repository 
 from core.utils import parse_coordinates 
 from datetime import datetime
 

@@ -8,7 +8,7 @@ class MongoConnection:
     def __init__(self, db_name):
         # Add extra find_* methods to pymongo collection objects:
         pymongoarrow.monkey.patch_all()
-
+    
         self.client = MongoClient(MONGO_URI)
         self.db = self.client.get_database(db_name)
 

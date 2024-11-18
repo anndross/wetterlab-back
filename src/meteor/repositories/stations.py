@@ -59,9 +59,19 @@ class StationRepository:
 
         service_value = f'{service}_value'
 
-        data = list(cursor_data)
+        def verify_if_service_data_exists(data):
+            if service in data:
+                return data
+            else:
+                data[service] = {
+                    "quality": 0,
+                    "value": 0
+                }
+                return data
 
-        if len(data) == 0 or service not in data[0]: return []
+        data = list(map(verify_if_service_data_exists, list(cursor_data)))
+
+        if len(data) == 0: return []
 
         df = pd.DataFrame(data)
         

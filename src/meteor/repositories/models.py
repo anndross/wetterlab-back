@@ -66,10 +66,17 @@ class ModelsRepository:
         cursor_data = self.collection.find(query_by_coordinates, target_data).limit(5000).sort('time', 1)
 
         service_value = f'{service}_value'
-        
-        data = list(cursor_data)
-       
-        if len(data) == 0 or service not in data[0]: return []
+        def verify_if_service_data_exists(data):
+            if service in data:
+                return data
+            else:
+                data[service] = 0
+                return data
+
+        data = list(map(verify_if_service_data_exists, list(cursor_data)))
+
+
+        if len(data) == 0: return []
 
         df = pd.DataFrame(data)
         df['time'] = pd.to_datetime(df['time'])

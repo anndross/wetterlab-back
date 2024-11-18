@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from datetime import datetime
 from core.utils import parse_coordinates 
-from ..repositories.station import station_repository 
+from ..repositories.stations import station_repository 
 from ..repositories.models import models_repository
 
 class Forecast(APIView):
