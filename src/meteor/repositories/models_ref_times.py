@@ -1,5 +1,4 @@
-from core.mongodb import meteor_connection 
-from datetime import datetime
+from core.mongodb import meteor_connection
 
 class ModelsRefTimesRepository:
     def handle_data(self, coordinates, date_from, date_to):
@@ -7,37 +6,60 @@ class ModelsRefTimesRepository:
 
         max_distance = 1000
 
-        query_by_coordinates = {
-            'position': {
-                '$near': {
-                    '$geometry': {
+        pipeline = [
+            {
+                '$geoNear': {
+                    'near': {
                         'type': 'Point',
                         'coordinates': coordinates
                     },
-                    '$maxDistance': max_distance
+                    'distanceField': 'distance',
+                    'maxDistance': max_distance,
+                    'spherical': True
                 }
             },
-            'time': {
-                '$gte': date_from,  # Data inicial (>=)
-                '$lte': date_to     # Data final (<=)
+            {
+                '$match': {
+                    'time': {
+                        '$gte': date_from,  # Data inicial (>=)
+                        '$lte': date_to     # Data final (<=)
+                    }
+                }
+            },
+            {
+                '$group': {
+                    '_id': '$ref_time',  # Agrupa por `ref_time` para remover duplicados
+                    'ref_time': { '$first': '$ref_time' }
+                }
+            },
+            {
+                '$sort': { 'ref_time': -1 }  # Ordena por `ref_time` de forma decrescente
+            },
+            {
+                '$limit': 5000  # Limita a 5000 resultados
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'value': {
+                        '$dateToString': {
+                            'format': '%Y-%m-%d-%H-%M-%S',
+                            'date': '$ref_time'
+                        }
+                    },
+                    'label': {
+                        '$dateToString': {
+                            'format': '%d/%m/%Y',
+                            'date': '$ref_time'
+                        }
+                    }
+                }
             }
-        }
+        ]
 
-        target_data = {
-            'ref_time': True
-        }
+        # Executa a pipeline de agregação
+        reftimes = models.aggregate(pipeline)
 
-        cursor_data = models.find(query_by_coordinates, target_data).limit(5000).sort('ref_time')
-
-        data = list(cursor_data)
-
-
-        unique_dates = list({d['ref_time']: d for d in data}.values())
-        
-        sorted_ref_times = sorted(unique_dates, key=lambda x: x['ref_time'], reverse=True)
-        
-        reftimes = map(lambda x: { 'value': x['ref_time'].strftime('%Y-%m-%d-%H-%M-%S'), 'label': x['ref_time'].strftime('%d/%m/%Y') }, sorted_ref_times)
-
-        return reftimes
+        return list(reftimes)
 
 models_ref_times_repository = ModelsRefTimesRepository()
