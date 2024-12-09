@@ -36,9 +36,6 @@ class ModelsRefTimesRepository:
                 '$sort': { 'ref_time': -1 }  # Ordena por `ref_time` de forma decrescente
             },
             {
-                '$limit': 5000  # Limita a 5000 resultados
-            },
-            {
                 '$project': {
                     '_id': 0,
                     'value': {
