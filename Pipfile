@@ -12,6 +12,7 @@ pandas = "*"
 pymongoarrow = "*"
 django-cors-headers = "*"
 djangorestframework = "*"
+gunicorn = "*"
 
 [dev-packages]
 

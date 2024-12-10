@@ -5,6 +5,7 @@ django-cors-headers==4.6.0; python_version >= '3.9'
 django-rest-framework==0.1.0
 djangorestframework==3.15.2; python_version >= '3.8'
 dnspython==2.7.0; python_version >= '3.9'
+gunicorn==23.0.0; python_version >= '3.7'
 numpy==2.2.0; python_version < '3.11'
 packaging==24.2; python_version >= '3.8'
 pandas==2.2.3; python_version >= '3.9'
