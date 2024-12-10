@@ -1,10 +1,11 @@
 from pathlib import Path
 from enum import Enum 
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-9o=v1*7#8^evmyd$ei1=j)uw9h6dhz$uil9(4wc@ni+250m3c&'
-DEBUG = True
-ALLOWED_HOSTS = []
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-9o=v1*7#8^evmyd$ei1=j)uw9h6dhz$uil9(4wc@ni+250m3c&')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,7 +58,7 @@ DATABASES = {
     }
 }
 
-MONGO_URI = "mongodb://web:gAAAAABmn-DOlnECChS2nZGfFcmnpc5CRUArlixaQgJe8VeaYWO8F4uBQIRpGxuX_Df_GrdJA9UHiRWx5P0pnJq9rNO5422xvw==@localhost:27017"
+MONGO_URI =  os.getenv('MONGO_URI', "mongodb://web:gAAAAABmn-DOlnECChS2nZGfFcmnpc5CRUArlixaQgJe8VeaYWO8F4uBQIRpGxuX_Df_GrdJA9UHiRWx5P0pnJq9rNO5422xvw==@localhost:27017") 
 MONGO_DATABASES = Enum('MongoDatabases', { 'METEOR': 'meteor', 'ERP': 'erp' })
 
 AUTH_PASSWORD_VALIDATORS = [
