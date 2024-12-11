@@ -2,7 +2,7 @@ from pathlib import Path
 from enum import Enum 
 import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-9o=v1*7#8^evmyd$ei1=j)uw9h6dhz$uil9(4wc@ni+250m3c&')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
