@@ -1,7 +1,7 @@
 from core.mongodb import meteor_connection
 
 class ModelsRefTimesRepository:
-    def handle_data(self, coordinates, date_from, date_to):
+    def handle_data(self, coordinates):
         models = meteor_connection.get_collection('models')
 
         max_distance = 1000
@@ -16,14 +16,6 @@ class ModelsRefTimesRepository:
                     'distanceField': 'distance',
                     'maxDistance': max_distance,
                     'spherical': True
-                }
-            },
-            {
-                '$match': {
-                    'time': {
-                        '$gte': date_from,  # Data inicial (>=)
-                        '$lte': date_to     # Data final (<=)
-                    }
                 }
             },
             {
