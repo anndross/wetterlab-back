@@ -7,60 +7,50 @@ from ..repositories.models import models_repository
 
 class Forecast(APIView):
     def get(self, request):
+        # TODO: adicionar validações e retornar status
+
         # parâmetros
         longitude = request.query_params.get('longitude')
         latitude = request.query_params.get('latitude')
         service = request.query_params.get('service')
-        date_from_array = request.query_params.get('from').split('-')
-        date_to_array = request.query_params.get('to').split('-')
         mean = request.query_params.get('mean')
-        date_from = datetime(int(date_from_array[0]), int(date_from_array[1]), int(date_from_array[2]), 0, 0, 0)
-        date_to = datetime(int(date_to_array[0]), int(date_to_array[1]), int(date_to_array[2]), 0, 0, 0)
         reftime = request.query_params.get('reftime')
-
-        if reftime:  
-            reftime_array = request.query_params.get('reftime').split('-')
-            reftime = datetime(int(reftime_array[0]), int(reftime_array[1]), int(reftime_array[2]), int(reftime_array[3]), int(reftime_array[4]), int(reftime_array[5]))
+        reftime_array = request.query_params.get('reftime').split('-')
+        reftime = datetime(int(reftime_array[0]), int(reftime_array[1]), int(reftime_array[2]), int(reftime_array[3]), int(reftime_array[4]), int(reftime_array[5]))
 
         # a ordem é longitude e latitude
         coordinates = parse_coordinates([longitude, latitude])
         
-        # pega os dados de stations com base nos parâmetros
-        stations = station_repository.handle_data(coordinates, date_from, date_to, service, mean) or []
-
         # pega os dados de models com base nos parâmetros
-        models = models_repository.handle_data(coordinates, date_from, date_to, service, mean, reftime) or []
+        models = models_repository.handle_data(coordinates, service, mean, reftime) or []
+
+        models_len = len(models)
+
+        if models_len > 0:
+            date_from = models[0]['date']
+            date_to = models[models_len - 1]['date']
+
+            # pega os dados de stations com base nos parâmetros
+            stations = station_repository.handle_data(coordinates, date_from, date_to, service, mean) or []
+
+      
 
         # pega o tamanho de stations e models
-        stationsLen = len(stations)
-        modelsLen = len(models)
+        stations_len = len(stations)
 
         # cria um array de datas com base no maior array
-        dates = []
-
-        def getDates(data):
+        def get_dates(data):
             return data['date']
 
-        if stationsLen > modelsLen:
-            dates = map(getDates, stations)
-
-        else:
-            dates = map(getDates, models)
+        dates = map(get_dates, models)
 
 
         # preenche os dados que faltaram para o menor array com zeros
         models_filled_array = []
         stations_filled_array = []
 
-        if stationsLen > modelsLen:
-            for index in range(modelsLen, stationsLen):
-                models_filled_array.append({
-                    'date': stations[index]['date'],
-                    'value': 0
-                })
-
-        elif modelsLen > stationsLen: 
-            for index in range(stationsLen, modelsLen):
+        if models_len > stations_len: 
+            for index in range(stations_len, models_len):
                 stations_filled_array.append({
                     'date': models[index]['date'],
                     'value': 0

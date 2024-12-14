@@ -8,6 +8,8 @@ from datetime import datetime
 class StationsView(APIView):
 
     def get(self, request):
+        # TODO: adicionar validações e retornar status
+
         longitude = request.query_params.get('longitude')
         latitude = request.query_params.get('latitude')
 

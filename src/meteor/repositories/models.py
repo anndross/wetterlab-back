@@ -10,7 +10,7 @@ class ModelsRepository:
         self.collection = meteor_connection.get_collection('models')
         # self.collection.create_index([("position", "2dsphere")])
 
-    def handle_data(self, coordinates, date_from, date_to, service, mean, reftime): 
+    def handle_data(self, coordinates, service, mean, reftime): 
         max_distance = 1000
 
         query_by_coordinates = {
@@ -23,15 +23,8 @@ class ModelsRepository:
                     '$maxDistance': max_distance
                 }
             },
-            'time': {
-                '$gte': date_from,  # Data inicial (>=)
-                '$lte': date_to     # Data final (<=)
-            }
+            'ref_time': reftime
         }
-
-        if isinstance(reftime, date): 
-            query_by_coordinates['ref_time'] = reftime
-
 
         print(reftime, query_by_coordinates)
 

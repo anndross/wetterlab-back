@@ -5,6 +5,8 @@ from core.utils import parse_coordinates
 
 class ModelsRefTimes(APIView):        
     def get(self, request: Request):
+        # TODO: adicionar validações e retornar status
+
         longitude = request.query_params.get('longitude')
         latitude = request.query_params.get('latitude')
 
