@@ -6,6 +6,13 @@ name = "pypi"
 [packages]
 django-rest-framework = "*"
 pymongo = "*"
+django = "*"
+pyjwt = "*"
+pandas = "*"
+pymongoarrow = "*"
+django-cors-headers = "*"
+djangorestframework = "*"
+gunicorn = "*"
 
 [dev-packages]
 
