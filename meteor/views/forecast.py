@@ -50,7 +50,7 @@ class Forecast(APIView):
         def get_dates(data):
             return data['date']
 
-        dates = map(get_dates, models)
+        dates = list(map(get_dates, models))
 
 
         # preenche os dados que faltaram para o menor array com zeros
