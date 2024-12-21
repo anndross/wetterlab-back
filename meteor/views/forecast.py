@@ -26,6 +26,13 @@ class Forecast(APIView):
 
         models_len = len(models)
 
+        if models_len == 0:
+	        return Response({
+                'dates': [], 
+                'stations': [], 
+                'models': []
+            })
+
         if models_len > 0:
             date_from = models[0]['date']
             date_to = models[models_len - 1]['date']
