@@ -29,20 +29,6 @@ class Forecast(APIView):
         models = models_repository.handle_data(coordinates, service, mean, reftime) or []
 
         models_len = len(models)
-        print('models_len', models_len)
-        if models_len == 0:
-            return Response({
-                'dates': [], 
-                'stations': [], 
-                'models': []
-            })
-
-        if models_len == 0:
-	        return Response({
-                'dates': [], 
-                'stations': [], 
-                'models': []
-            })
 
         if models_len > 0:
             date_from = models[0]['date']
@@ -50,8 +36,12 @@ class Forecast(APIView):
 
             # pega os dados de stations com base nos parâmetros
             stations = station_repository.handle_data(coordinates, date_from, date_to, service, mean) or []
-
-      
+        else:
+            return Response({
+                'dates': [], 
+                'stations': [], 
+                'models': []
+            })
 
         # pega o tamanho de stations e models
         stations_len = len(stations)
