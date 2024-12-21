@@ -13,6 +13,7 @@ pymongoarrow = "*"
 django-cors-headers = "*"
 djangorestframework = "*"
 gunicorn = "*"
+django-redis = "*"
 
 [dev-packages]
 

@@ -4,8 +4,12 @@ from datetime import datetime
 from core.utils import parse_coordinates 
 from ..repositories.stations import station_repository 
 from ..repositories.models import models_repository
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 class Forecast(APIView):
+    @method_decorator(cache_page(86400)) # Cache por 1 dia
+
     def get(self, request):
         # TODO: adicionar validações e retornar status
 
@@ -25,6 +29,13 @@ class Forecast(APIView):
         models = models_repository.handle_data(coordinates, service, mean, reftime) or []
 
         models_len = len(models)
+        print('models_len', models_len)
+        if models_len == 0:
+            return Response({
+                'dates': [], 
+                'stations': [], 
+                'models': []
+            })
 
         if models_len > 0:
             date_from = models[0]['date']

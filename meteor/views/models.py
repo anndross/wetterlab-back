@@ -3,8 +3,12 @@ from rest_framework.response import Response
 from ..repositories.models import models_repository
 from datetime import datetime
 from core.utils import parse_coordinates 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 class Models(APIView):
+    @method_decorator(cache_page(86400)) # Cache por 1 dia
+
     def get(self, request):
         # TODO: adicionar validações e retornar status
 

@@ -4,8 +4,11 @@ from rest_framework.response import Response
 from ..repositories.stations import station_repository 
 from core.utils import parse_coordinates 
 from datetime import datetime
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 class StationsView(APIView):
+    @method_decorator(cache_page(86400)) # Cache por 1 dia
 
     def get(self, request):
         # TODO: adicionar validações e retornar status

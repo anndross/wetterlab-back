@@ -2,7 +2,6 @@ from pathlib import Path
 from enum import Enum 
 import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-9o=v1*7#8^evmyd$ei1=j)uw9h6dhz$uil9(4wc@ni+250m3c&')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
@@ -32,6 +31,17 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient'
+        },
+        'KEY_PREFIX': 'django_orm'
+    }
+}
+
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
@@ -51,13 +61,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 MONGO_URI =  os.getenv('MONGO_URI', "mongodb://web:gAAAAABmn-DOlnECChS2nZGfFcmnpc5CRUArlixaQgJe8VeaYWO8F4uBQIRpGxuX_Df_GrdJA9UHiRWx5P0pnJq9rNO5422xvw==@localhost:27017") 
 MONGO_DATABASES = Enum('MongoDatabases', { 'METEOR': 'meteor', 'ERP': 'erp' })
