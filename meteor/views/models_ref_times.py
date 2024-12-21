@@ -2,8 +2,12 @@ from rest_framework.views import Request, Response, APIView
 from datetime import datetime
 from ..repositories.models_ref_times import models_ref_times_repository
 from core.utils import parse_coordinates 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 class ModelsRefTimes(APIView):        
+    @method_decorator(cache_page(86400)) # Cache por 1 dia
+
     def get(self, request: Request):
         # TODO: adicionar validações e retornar status
 

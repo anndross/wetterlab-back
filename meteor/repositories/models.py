@@ -33,6 +33,8 @@ class ModelsRepository:
             'time': True,
         }
 
+        print('cursor_data')
+
         cursor_data = self.collection.find(query_by_coordinates, target_data).sort('time', 1)
 
         service_value = f'{service}_value'
@@ -44,6 +46,7 @@ class ModelsRepository:
                 return data
 
         data = list(map(verify_if_service_data_exists, list(cursor_data)))
+        print(data)
 
 
         if len(data) == 0: return []
