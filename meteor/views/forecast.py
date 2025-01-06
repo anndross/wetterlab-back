@@ -91,16 +91,10 @@ class Forecast(APIView):
             mapped_stations[0]['y'].append(data['value'])
 
             mapped_stations[1]['x'].append(data['date'])
-            if data['value'] == 0:
-                mapped_stations[1]['y'].append(data['value'])
-            else: 
-                mapped_stations[1]['y'].append(data['value'] / 1.2)
+            mapped_stations[1]['y'].append(data['value'] / 1.2)
 
             mapped_stations[2]['x'].append(data['date'])
-            if data['value'] == 0:
-                mapped_stations[2]['y'].append(data['value'])
-            else: 
-                mapped_stations[2]['y'].append(data['value'] * 1.2)
+            mapped_stations[2]['y'].append(data['value'] * 1.2)
 
 
 
@@ -126,16 +120,10 @@ class Forecast(APIView):
             mapped_models[0]['y'].append(data['value'])
 
             mapped_models[1]['x'].append(data['date'])
-            if data['value'] == 0:
-                mapped_models[1]['y'].append(data['value'])
-            else: 
-                mapped_models[1]['y'].append(data['value'] / 1.2)
+            mapped_models[1]['y'].append(data['value'] / 1.2)
 
             mapped_models[2]['x'].append(data['date'])
-            if data['value'] == 0:
-                mapped_models[2]['y'].append(data['value'])
-            else: 
-                mapped_models[2]['y'].append(data['value'] * 1.2)
+            mapped_models[2]['y'].append(data['value'] * 1.2)
 
 
         for data in response_data['models']:

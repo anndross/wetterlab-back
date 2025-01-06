@@ -1,8 +1,7 @@
 from core.mongodb import meteor_connection
 from core.utils import parse_bson
-import unicodedata
-import math
 import pandas as pd
+import numpy as np
 
 class StationRepository:
     def __init__(self): 
@@ -15,56 +14,48 @@ class StationRepository:
         query_by_coordinates = {
             'position': {
                 '$near': {
-                    '$geometry': {
-                        'type': 'Point',
-                        'coordinates': coordinates
-                    },
+                    '$geometry': {'type': 'Point', 'coordinates': coordinates},
                     '$maxDistance': max_distance
                 }
             },
-            'datetime': {
-                '$gte': date_from,  # Data inicial (>=)
-                '$lte': date_to     # Data final (<=)
-            }
+            'datetime': {'$gte': date_from, '$lte': date_to}
         }
 
-        target_data = {
-            service: True,
-            'datetime': True
-        }
+        target_data = {service: {"$ifNull": [f"${service}", {"quality": 0, "value": 0}]}, 'datetime': True}
 
         cursor_data = self.collection.find(query_by_coordinates, target_data).sort('datetime', 1)
+        data = list(cursor_data)
 
-        service_value = f'{service}_value'
+        if len(data) == 0:
+            return []
 
-        def verify_if_service_data_exists(data):
-            if service in data:
-                return data
-            else:
-                data[service] = {
-                    "quality": 0,
-                    "value": 0
-                }
-                return data
-
-        data = list(map(verify_if_service_data_exists, list(cursor_data)))
-
-        if len(data) == 0: return []
 
         df = pd.DataFrame(data)
-        
         df['datetime'] = pd.to_datetime(df['datetime'])
 
-        df[service_value] = pd.to_numeric(df[service].apply(lambda x: x['value']), errors='coerce')        
-        df[service_value].fillna(0, inplace=True)
+        service_value = f'{service}_value'
+        df[service_value] = pd.to_numeric(df[service].apply(lambda x: x.get('value', 0)), errors='coerce').fillna(0)
 
+        df['datetime'] = pd.to_datetime(df['datetime'])
         df.set_index('datetime', inplace=True)
 
-        mean_by_interval = df[service_value].resample(f'{mean}D').mean()
-        
-        json_data = mean_by_interval.reset_index().rename(columns={'datetime': 'date', service_value: 'value'}).to_dict(orient='records')
+        # Calculando estatísticas por intervalo de tempo
+        resampled_stats = (
+            df[service_value]
+            .resample(f'{mean}D')
+            .agg(['min', lambda x: np.percentile(x, 25), 'median', lambda x: np.percentile(x, 75), 'max'])
+        )
 
-        return json_data
+        # Renomear as colunas resultantes
+        resampled_stats.columns = ['min', 'p25', 'median', 'p95_rsr', 'max']
+
+        # Resetando o índice para trazer 'datetime' como coluna
+        resampled_stats.reset_index(inplace=True)
+
+        dict_data = resampled_stats.to_dict(orient='records')
+
+        return dict_data
+
 
 
 station_repository = StationRepository()
