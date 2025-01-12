@@ -9,22 +9,21 @@ import numpy as np
 class ModelsRepository:
     def __init__(self): 
         self.collection = meteor_connection.get_collection('models')
-        # self.collection.create_index([("position", "2dsphere")])
 
-    def handle_data(self, coordinates, service, mean, reftime): 
+    def handle_data(self, coordinate, service, mean, ref_time): 
         max_distance = 1000
 
-        query_by_coordinates = {
+        query_by_coordinate = {
             'position': {
                 '$near': {
                     '$geometry': {
                         'type': 'Point',
-                        'coordinates': coordinates
+                        'coordinates': coordinate
                     },
                     '$maxDistance': max_distance
                 }
             },
-            'ref_time': reftime
+            'ref_time': ref_time
         }
 
         target_data = {
@@ -32,7 +31,7 @@ class ModelsRepository:
             'time': True,
         }
 
-        cursor_data = self.collection.find(query_by_coordinates, target_data).sort('time', 1)
+        cursor_data = self.collection.find(query_by_coordinate, target_data).sort('time', 1)
         data = list(cursor_data)
 
         if len(data) == 0:
@@ -63,12 +62,10 @@ class ModelsRepository:
         )
 
         # Renomear as colunas resultantes
-        resampled_stats.columns = ['min', 'p25', 'median', 'p95_rsr', 'max']
+        resampled_stats.columns = ['min', 'p25', 'median', 'p75', 'max']
 
         # Resetando o índice para trazer 'datetime' como coluna
         resampled_stats.reset_index(inplace=True)
-
-        print(resampled_stats.to_dict(orient='records'))
 
         dict_data = resampled_stats.to_dict(orient='records')
         return dict_data

@@ -8,13 +8,13 @@ class StationRepository:
         self.collection = meteor_connection.get_collection('stations')
         # self.collection.create_index([("position", "2dsphere")])
 
-    def handle_data(self, coordinates, date_from, date_to, service, mean): 
+    def handle_data(self, coordinate, date_from, date_to, service, mean): 
         max_distance = 1000
 
-        query_by_coordinates = {
+        query_by_coordinate = {
             'position': {
                 '$near': {
-                    '$geometry': {'type': 'Point', 'coordinates': coordinates},
+                    '$geometry': {'type': 'Point', 'coordinates': coordinate},
                     '$maxDistance': max_distance
                 }
             },
@@ -23,7 +23,7 @@ class StationRepository:
 
         target_data = {service: {"$ifNull": [f"${service}", {"quality": 0, "value": 0}]}, 'datetime': True}
 
-        cursor_data = self.collection.find(query_by_coordinates, target_data).sort('datetime', 1)
+        cursor_data = self.collection.find(query_by_coordinate, target_data).sort('datetime', 1)
         data = list(cursor_data)
 
         if len(data) == 0:
@@ -47,7 +47,7 @@ class StationRepository:
         )
 
         # Renomear as colunas resultantes
-        resampled_stats.columns = ['min', 'p25', 'median', 'p95_rsr', 'max']
+        resampled_stats.columns = ['min', 'p25', 'median', 'p75', 'max']
 
         # Resetando o índice para trazer 'datetime' como coluna
         resampled_stats.reset_index(inplace=True)

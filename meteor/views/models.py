@@ -16,15 +16,15 @@ class Models(APIView):
         service = request.query_params.get('service')
         mean = request.query_params.get('mean')
 
-        reftime = request.query_params.get('reftime')
+        ref_time = request.query_params.get('ref-time')
 
-        reftime_array = request.query_params.get('reftime').split('-')
-        reftime = datetime(int(reftime_array[0]), int(reftime_array[1]), int(reftime_array[2]), int(reftime_array[3]), int(reftime_array[4]), int(reftime_array[5]))
+        ref_time_array = request.query_params.get('ref-time').split('-')
+        ref_time = datetime(int(ref_time_array[0]), int(ref_time_array[1]), int(ref_time_array[2]), int(ref_time_array[3]), int(ref_time_array[4]), int(ref_time_array[5]))
 
         # The order matters! Long [1] - Lat [0]
         coordinates = parse_coordinates([longitude, latitude])
 
-        models = models_repository.handle_data(coordinates, service, mean, reftime) or []
+        models = models_repository.handle_data(coordinates, service, mean, ref_time) or []
 
         return Response(models)
 
