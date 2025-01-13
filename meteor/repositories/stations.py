@@ -52,7 +52,7 @@ class StationRepository:
         # Resetando o índice para trazer 'datetime' como coluna
         resampled_stats.reset_index(inplace=True)
 
-        dict_data = resampled_stats.to_dict(orient='records')
+        dict_data = resampled_stats.rename(columns={'datetime': 'date'}).to_dict(orient='records')
 
         return dict_data
 
