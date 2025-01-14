@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from ..repositories.models import models_repository
+from ..services.models import ModelsService
 from datetime import datetime
-from core.utils import parse_coordinates 
+from setup.utils import parse_coordinates 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
@@ -24,7 +24,9 @@ class Models(APIView):
         # The order matters! Long [1] - Lat [0]
         coordinates = parse_coordinates([longitude, latitude])
 
-        models = models_repository.handle_data(coordinates, service, mean, ref_time) or []
+        models_service = ModelsService(coordinates, service, mean, ref_time)
+
+        models = models_service.handle_data() or []
 
         return Response(models)
 

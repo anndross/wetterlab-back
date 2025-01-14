@@ -42,7 +42,7 @@ CACHES = {
     }
 }
 
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = 'setup.urls'
 
 TEMPLATES = [
     {
@@ -60,7 +60,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = 'setup.wsgi.application'
 
 MONGO_URI =  os.getenv('MONGO_URI', "mongodb://web:gAAAAABmn-DOlnECChS2nZGfFcmnpc5CRUArlixaQgJe8VeaYWO8F4uBQIRpGxuX_Df_GrdJA9UHiRWx5P0pnJq9rNO5422xvw==@localhost:27017") 
 MONGO_DATABASES = Enum('MongoDatabases', { 'METEOR': 'meteor', 'ERP': 'erp' })

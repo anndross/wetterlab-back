@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from core.utils import jwt_verify_decorator
+from setup.utils import jwt_verify_decorator
 from django.utils.decorators import method_decorator
 
 class JWTProtectedView(APIView): 

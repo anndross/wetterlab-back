@@ -1,5 +1,5 @@
 from rest_framework.exceptions import AuthenticationFailed  
-from core.utils.jwt import decode_jwt 
+from setup.utils.jwt import decode_jwt 
 
 # This is a custom decorator who should be used in a View method as described below
 # from django.utils.decorators import method_decorator

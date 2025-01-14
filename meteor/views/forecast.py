@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from datetime import datetime
-from core.utils import parse_coordinates 
-from ..repositories.forecast import ForecastRepository
+from setup.utils import parse_coordinates 
+from ..services.forecast import ForecastService
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
@@ -24,7 +24,7 @@ class Forecast(APIView):
         ref_time_array = request.query_params.get('ref-time').split('-')
         ref_time = datetime(int(ref_time_array[0]), int(ref_time_array[1]), int(ref_time_array[2]), int(ref_time_array[3]), int(ref_time_array[4]), int(ref_time_array[5]))
 
-        forecast_repository = ForecastRepository(ref_time, coordinate, service, mean)
+        forecast_repository = ForecastService(ref_time, coordinate, service, mean)
         forecast = forecast_repository.get_forecast()
         
         return Response(forecast)

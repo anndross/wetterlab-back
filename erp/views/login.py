@@ -2,9 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from json import loads, dumps
-from core.mongodb import erp_connection
-from core.utils import parse_bson
-from core.utils.jwt import encode_jwt, decode_jwt
+from setup.db import erp_connection
+from setup.utils import parse_bson
+from setup.utils.jwt import encode_jwt, decode_jwt
 from ..serializers import LoginSerializer
 
 class LoginView(APIView):

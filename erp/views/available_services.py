@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from core.mongodb import erp_connection
-from core.utils import parse_bson
+from setup.db import erp_connection
+from setup.utils import parse_bson
 
 class AvailableServices(APIView):
     def get(self, request):

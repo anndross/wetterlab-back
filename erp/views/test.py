@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from core.views import JWTProtectedView
+from setup.views import JWTProtectedView
 
 class TestView(JWTProtectedView):
     def get(self, request):

@@ -1,8 +1,6 @@
 from pymongo import MongoClient 
-from core.settings import MONGO_URI, MONGO_DATABASES
-from pymongoarrow.api import Schema
+from setup.settings import MONGO_URI, MONGO_DATABASES
 import pymongoarrow.monkey
-import bson
 
 class MongoConnection: 
     def __init__(self, db_name):

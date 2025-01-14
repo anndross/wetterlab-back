@@ -1,7 +1,10 @@
-from core.mongodb import meteor_connection
+from setup.db import meteor_connection
 
-class ModelsRefTimesRepository:
-    def handle_data(self, coordinates):
+class ModelsRefTimesService:
+    def __init__(self, coordinate):
+        self.coordinate = coordinate
+
+    def get_ref_times(self):
         models = meteor_connection.get_collection('models')
 
         max_distance = 1000
@@ -11,7 +14,7 @@ class ModelsRefTimesRepository:
                 '$geoNear': {
                     'near': {
                         'type': 'Point',
-                        'coordinates': coordinates
+                        'coordinates': self.coordinates
                     },
                     'distanceField': 'distance',
                     'maxDistance': max_distance,
@@ -47,8 +50,6 @@ class ModelsRefTimesRepository:
         ]
 
         # Executa a pipeline de agregação
-        reftimes = models.aggregate(pipeline)
+        ref_times = models.aggregate(pipeline)
 
-        return list(reftimes)
-
-models_ref_times_repository = ModelsRefTimesRepository()
+        return list(ref_times)
