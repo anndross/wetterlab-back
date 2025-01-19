@@ -14,7 +14,7 @@ class ModelsRefTimesService:
                 '$geoNear': {
                     'near': {
                         'type': 'Point',
-                        'coordinates': self.coordinates
+                        'coordinates': self.coordinate
                     },
                     'distanceField': 'distance',
                     'maxDistance': max_distance,
