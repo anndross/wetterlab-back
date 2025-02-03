@@ -25,6 +25,8 @@ class ModelsService:
                     '$maxDistance': max_distance
                 }
             },
+            'category': 0,
+            'type': 1,
             'ref_time': self.ref_time
         }
 
