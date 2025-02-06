@@ -3,7 +3,7 @@ from setup.utils import parse_bson
 import pandas as pd
 import numpy as np
 
-class ModelsService:
+class ModelsEnsembleService:
     def __init__(self, coordinate, service, mean, ref_time):
         self.collection = meteor_connection.get_collection('models')
         self.ref_time = ref_time
@@ -25,8 +25,7 @@ class ModelsService:
                     '$maxDistance': max_distance
                 }
             },
-            'category': 0,
-            'type': 1,
+            'tag': 'ensemble',
             'ref_time': self.ref_time
         }
 
@@ -49,24 +48,29 @@ class ModelsService:
         if not data:
             return []
 
-        # Transformando dados em DataFrame
         df = pd.DataFrame(data)
         df['time'] = pd.to_datetime(df['time'])
         df.set_index('time', inplace=True)
 
-        # Garantindo que o campo do serviço seja numérico
-        df[self.service] = pd.to_numeric(df[self.service], errors='coerce').fillna(0)
+        # Criando colunas com os valores existentes no banco
+        df['min'] = df[self.service].apply(lambda x: x.get('min', 0))
+        df['p25'] = df[self.service].apply(lambda x: x.get('p25', 0))
+        df['median'] = df[self.service].apply(lambda x: x.get('avg', 0))  # Supondo que 'avg' seja a mediana
+        df['p75'] = df[self.service].apply(lambda x: x.get('p75', 0))
+        df['max'] = df[self.service].apply(lambda x: x.get('max', 0))
 
-        # Resample e cálculo de estatísticas
-        stats = df[self.service].resample(f'{self.mean}D').agg(
-            ['median']
-        )
+        # Removendo a coluna original do serviço, pois agora temos os valores extraídos
+        df.drop(columns=[self.service], inplace=True)
 
-        # Renomeando colunas para termos descritivos
-        stats.columns = ['median']
+        # Resample mantendo as estatísticas existentes e calculando médias no período definido
+        stats = df.resample(f'{self.mean}D').mean()
+
+        # Resetando índice e renomeando coluna de tempo
         stats.reset_index(inplace=True)
+        stats.rename(columns={'time': 'date'}, inplace=True)
 
-        # Convertendo para formato de lista de dicionários
-        result = stats.rename(columns={'time': 'date'}).to_dict(orient='records')
+        # Convertendo para lista de dicionários
+        result = stats.to_dict(orient='records')
+        print('result', result)
         return result
 

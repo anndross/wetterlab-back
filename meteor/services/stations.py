@@ -62,16 +62,12 @@ class StationsService:
         # Calculando estatísticas por intervalo de tempo
         stats = df[service_value_col].resample(f'{self.mean}D').agg(
             [
-                'min',
-                lambda x: np.percentile(x, 25),
                 'median',
-                lambda x: np.percentile(x, 75),
-                'max'
             ]
         )
 
         # Renomeando colunas para termos descritivos
-        stats.columns = ['min', 'p25', 'median', 'p75', 'max']
+        stats.columns = ['median']
         stats.reset_index(inplace=True)
 
         # Convertendo para formato de lista de dicionários

@@ -1,5 +1,6 @@
 from .stations import StationsService 
 from .models import ModelsService
+from .models_ensemble import ModelsEnsembleService
 
 class ForecastService:
   def __init__(self, ref_time, coordinate, service, mean):
@@ -10,7 +11,9 @@ class ForecastService:
 
   def get_forecast(self):
       models = self.get_models_data()
+      models_ensemble = self.get_models_ensemble_data()
 
+      print('models_ensemble', models_ensemble)
       if not models:
           raise ValueError("No models data available")
 
@@ -23,6 +26,7 @@ class ForecastService:
           'dates': dates,
           'stations': self.fill_data(dates=dates, data=stations),
           'models': models,
+          'models_ensemble': self.fill_data(dates=dates, data=models_ensemble)
       }
 
   def fill_data(self, dates, data):
@@ -58,3 +62,12 @@ class ForecastService:
           mean=self.mean
       )
       return station_service.handle_data()
+
+  def get_models_ensemble_data(self):
+      models_ensemble_service = ModelsEnsembleService(
+          ref_time=self.ref_time,
+          service=self.service,
+          mean=self.mean,
+          coordinate=self.coordinate
+      )
+      return models_ensemble_service.handle_data()
