@@ -13,7 +13,6 @@ class ForecastService:
       models = self.get_models_data()
       models_ensemble = self.get_models_ensemble_data()
 
-      print('models_ensemble', models_ensemble)
       if not models:
           raise ValueError("No models data available")
 

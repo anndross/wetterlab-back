@@ -8,7 +8,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
 class Forecast(APIView):
-    # @method_decorator(cache_page(86400))  # Cache por 1 dia
+    @method_decorator(cache_page(86400))  # Cache por 1 dia
+
     def get(self, request):
         # Validação de parâmetros
         longitude = request.query_params.get('longitude')
