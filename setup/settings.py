@@ -93,3 +93,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3030',
 ]
+
+# EMAIL Settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_PORT = 2525
+EMAIL_HOST_USER = '90e714ce4d6146'
+EMAIL_HOST_PASSWORD = '0d32bb3af1c18a'
