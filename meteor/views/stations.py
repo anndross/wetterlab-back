@@ -1,5 +1,6 @@
 from setup.db import meteor_connection
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from ..services.stations import StationsService 
 from setup.utils import parse_coordinates 
@@ -7,25 +8,34 @@ from datetime import datetime
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
-class StationsView(APIView):
+class Stations(APIView):
     def get(self, request):
         # TODO: adicionar validações e retornar status
 
-        longitude = request.query_params.get('longitude')
-        latitude = request.query_params.get('latitude')
+        lon = request.query_params.get('lon')
+        lat = request.query_params.get('lat')
 
         service = request.query_params.get('service')
         mean = request.query_params.get('mean')
 
-        date_from_array = request.query_params.get('from').split('-')
-        date_to_array = request.query_params.get('to').split('-')
+        date_from = request.query_params.get('date-from')
+        date_to = request.query_params.get('date-to')
 
-        date_from = datetime(int(date_from_array[0]), int(date_from_array[1]), int(date_from_array[2]))
-        date_to = datetime(int(date_to_array[0]), int(date_to_array[1]), int(date_to_array[2]))
-        # The order matters! Long [1] - Lat [0]
-        coordinates = parse_coordinates([longitude, latitude])
+        if not all([lon, lat, service, mean, date_from, date_to]):
+            raise ValidationError("Todos os parâmetros (lat, lon, service, date-from, date-to) são obrigatórios.")
 
-        stations_service = StationsService(coordinates, date_from, date_to, service, mean)
+        try: 
+            coordinate = parse_coordinates([lon, lat])
+        except ValueError:
+            raise ValidationError("Coordenada fornecida inválida.")
+
+        try:
+            date_from = datetime.strptime(date_from, "%Y-%m-%d-%H-%M-%S")
+            date_to = datetime.strptime(date_to, "%Y-%m-%d-%H-%M-%S")
+        except ValueError: 
+            raise ValidationError("Formato de datas inválidos. Use o formato YYYY-MM-DD-HH-MM-SS.")
+
+        stations_service = StationsService(coordinate, date_from, date_to, service, mean)
 
         stations = stations_service.handle_data() or []
 

@@ -1,13 +1,13 @@
-from django.contrib import admin
 from django.urls import path
-
-from .views import StationsView, Models, Forecast, ModelsRefTimes, ModelsEnsemble, StationsStatisticsView
+from .views import Stations, Models, Forecast, ModelsRefTimes, ModelsEnsemble, StationsStatistics, ModelsStatistics, ForecastStatistics
 
 urlpatterns = [
     path('forecast', Forecast.as_view()),
     path('models', Models.as_view()),
     path('models-ref-times', ModelsRefTimes.as_view()),
     path('models-ensemble', ModelsEnsemble.as_view()),
-    path('stations', StationsView.as_view()),
-    path('stations-statistics', StationsStatisticsView.as_view()),
+    path('stations', Stations.as_view()),
+    path('stations-statistics', StationsStatistics.as_view()),
+    path('models-statistics', ModelsStatistics.as_view()),
+    path('forecast-statistics', ForecastStatistics.as_view()),
 ]

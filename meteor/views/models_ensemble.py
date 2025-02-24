@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from ..services.models_ensemble import ModelsEnsembleService
 from datetime import datetime
@@ -8,21 +9,28 @@ class ModelsEnsemble(APIView):
     def get(self, request):
         # TODO: adicionar validações e retornar status
 
-        longitude = request.query_params.get('longitude')
-        latitude = request.query_params.get('latitude')
+        lon = request.query_params.get('lon')
+        lat = request.query_params.get('lat')
 
         service = request.query_params.get('service')
         mean = request.query_params.get('mean')
-
         ref_time = request.query_params.get('ref-time')
 
-        ref_time_array = request.query_params.get('ref-time').split('-')
-        ref_time = datetime(int(ref_time_array[0]), int(ref_time_array[1]), int(ref_time_array[2]), int(ref_time_array[3]), int(ref_time_array[4]), int(ref_time_array[5]))
+        if not all([lon, lat, service, mean, ref_time]):
+            raise ValidationError("Todos os parâmetros (lat, lon, service, mean, ref-time) são obrigatórios.")
 
-        # The order matters! Long [1] - Lat [0]
-        coordinates = parse_coordinates([longitude, latitude])
+        try:
+            coordinate = parse_coordinates([lon, lat])
+        except ValueError:
+            raise ValidationError("Coordenada fornecida inválida.")
 
-        models_service = ModelsEnsembleService(coordinates, service, mean, ref_time)
+        try:
+            ref_time = datetime.strptime(ref_time, "%Y-%m-%d-%H-%M-%S")
+        except ValueError:
+            raise ValidationError("Formato de ref-time inválido. Use o formato YYYY-MM-DD-HH-MM-SS.")
+
+
+        models_service = ModelsEnsembleService(coordinate, service, mean, ref_time)
 
         models = models_service.handle_data() or []
 

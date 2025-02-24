@@ -5,7 +5,7 @@ from datetime import datetime
 from meteor.services.stations_statistics import StationsStatisticsService
 from rest_framework.response import Response
 
-class StationsStatisticsView(APIView):
+class StationsStatistics(APIView):
   def get(self, request):
     date_from = request.query_params.get('date-from')
     date_to = request.query_params.get('date-to')
@@ -17,7 +17,7 @@ class StationsStatisticsView(APIView):
 
 
     if not all([lat, lon, service, date_from, date_to]):
-        raise ValidationError("Todos os parâmetros (lon, lon, service, ref-time) são obrigatórios.")
+        raise ValidationError("Todos os parâmetros (lat, lon, service, date-from, date-to) são obrigatórios.")
 
     try:
         coordinate = parse_coordinates([lon, lat])

@@ -55,11 +55,14 @@ class StationsStatisticsService:
     df['datetime'] = pd.to_datetime(df['datetime'])
     df.set_index('datetime', inplace=True)
 
-    # Garantindo que o campo do serviço seja numérico
-    df[self.service] = pd.to_numeric(df[self.service], errors='coerce').fillna(0)
+    df[f'{self.service}_value'] = pd.to_numeric(
+              df[self.service].apply(lambda x: x.get('value', 0)), errors='coerce'
+          ).fillna(0)
+
+    service_value_col = f'{self.service}_value'
 
     # Resample e cálculo de estatísticas
-    stats = df[self.service].resample('30D').agg(
+    stats = df[service_value_col].resample('30D').agg(
         [
             'min',
             lambda x: np.percentile(x, 25),
