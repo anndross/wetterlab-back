@@ -52,12 +52,15 @@ class ModelsEnsembleService:
         df['time'] = pd.to_datetime(df['time'])
         df.set_index('time', inplace=True)
 
+        def get_x_value(x, type):
+            return x.get(type, 0) if x and hasattr(x, 'get') else 0
+
         # Criando colunas com os valores existentes no banco
-        df['min'] = df[self.service].apply(lambda x: x.get('min', 0))
-        df['p25'] = df[self.service].apply(lambda x: x.get('p25', 0))
-        df['median'] = df[self.service].apply(lambda x: x.get('avg', 0))  # Supondo que 'avg' seja a mediana
-        df['p75'] = df[self.service].apply(lambda x: x.get('p75', 0))
-        df['max'] = df[self.service].apply(lambda x: x.get('max', 0))
+        df['min'] = df[self.service].apply(lambda x: get_x_value(x, "min"))
+        df['p25'] = df[self.service].apply(lambda x: get_x_value(x, "p25"))
+        df['median'] = df[self.service].apply(lambda x: get_x_value(x, "avg"))  # Supondo que 'avg' seja a mediana
+        df['p75'] = df[self.service].apply(lambda x: get_x_value(x, "p75"))
+        df['max'] = df[self.service].apply(lambda x: get_x_value(x, "max"))
 
         # Removendo a coluna original do serviço, pois agora temos os valores extraídos
         df.drop(columns=[self.service], inplace=True)

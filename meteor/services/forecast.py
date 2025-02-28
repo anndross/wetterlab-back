@@ -1,32 +1,41 @@
 from .stations import StationsService 
 from .models import ModelsService
 from .models_ensemble import ModelsEnsembleService
+import concurrent.futures
 
 class ForecastService:
   def __init__(self, ref_time, coordinate, service, mean):
-        self.ref_time = ref_time
-        self.coordinate = coordinate
-        self.service = service
-        self.mean = mean
+    self.ref_time = ref_time
+    self.coordinate = coordinate
+    self.service = service
+    self.mean = mean
 
   def get_forecast(self):
-      models = self.get_models_data()
-      models_ensemble = self.get_models_ensemble_data()
+    # Usando ThreadPoolExecutor para executar funções de forma paralela
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # Submetendo as funções para execução paralela
+        future_models = executor.submit(self.get_models_data)
+        future_models_ensemble = executor.submit(self.get_models_ensemble_data)
 
-      if not models:
-          raise ValueError("No models data available")
+        # Esperando pelos resultados das funções paralelizadas
+        models = future_models.result()
+        models_ensemble = future_models_ensemble.result()
 
-      dates = [model['date'] for model in models]
-      stations_date_from, stations_date_to = models[0]['date'], models[-1]['date']
 
-      stations = self.get_stations_data(date_from=stations_date_from, date_to=stations_date_to)
+    if not models:
+      raise ValueError("Não há dados de models disponíveis.")
 
-      return {
-          'dates': dates,
-          'stations': self.fill_data(dates=dates, data=stations),
-          'models': models,
-          'models_ensemble': self.fill_data(dates=dates, data=models_ensemble)
-      }
+    dates = [model['date'] for model in models]
+    stations_date_from, stations_date_to = models[0]['date'], models[-1]['date']
+
+    stations = self.get_stations_data(date_from=stations_date_from, date_to=stations_date_to)
+
+    return {
+        'dates': dates,
+        'stations': self.fill_data(dates=dates, data=stations),
+        'models': models,
+        'models_ensemble': self.fill_data(dates=dates, data=models_ensemble)
+    }
 
   def fill_data(self, dates, data):
       data_len = len(data)

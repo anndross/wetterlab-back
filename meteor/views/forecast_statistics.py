@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from datetime import datetime
-from setup.utils import parse_coordinates 
+from setup.utils import parse_coordinates, logger, InternalServerError
 from ..services.forecast_statistics import ForecastStatisticsService
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -30,8 +30,13 @@ class ForecastStatistics(APIView):
         except ValueError:
             raise ValidationError("Formato de ref-time inválido. Use o formato YYYY-MM-DD-HH-MM-SS.")
 
-        # Obtenção da previsão
-        forecast_service = ForecastStatisticsService(ref_time, coordinate, service)
-        forecast = forecast_service.get_forecast()
+        try:
+            forecast_service = ForecastStatisticsService(ref_time, coordinate, service)
+
+            # Obtenção da previsão
+            forecast = forecast_service.get_forecast()
+        except Exception as e:
+            logger.error(f"Erro no servidor: {str(e)}")
+            raise InternalServerError(f"Erro interno no servidor: {str(e)}")
 
         return Response(forecast)
