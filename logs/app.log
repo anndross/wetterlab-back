@@ -1,0 +1,167 @@
+2025-03-16 17:34:28,795 - root - ERROR - Erro na view LoginView - POST /api/erp/login: {'error': ErrorDetail(string='Não foi encontrado nenhum usuário com este email', code=400)}
+Traceback (most recent call last):
+  File "/home/andrey/office/wetterlab/erp/views/login.py", line 24, in post
+    customer = login_service.find_customer()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/office/wetterlab/erp/services/login.py", line 16, in find_customer
+    customer = erp_connection.get_collection('customers').find_one({
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/collection.py", line 1495, in find_one
+    for result in cursor.limit(-1):
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/cursor.py", line 1243, in next
+    if len(self.__data) or self._refresh():
+                           ^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/cursor.py", line 1160, in _refresh
+    self.__send_message(q)
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/cursor.py", line 1039, in __send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/_csot.py", line 108, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1431, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1540, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/_csot.py", line 108, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1507, in _retry_internal
+    ).run()
+      ^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 2353, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 2483, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 2439, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1322, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/topology.py", line 368, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/topology.py", line 346, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/topology.py", line 253, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/topology.py", line 303, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 67d7359abad6c9e8c9fddad5, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/office/wetterlab/erp/views/login.py", line 26, in post
+    raise ValidationError(detail={ "error": "Não foi encontrado nenhum usuário com este email" }, code=status.HTTP_400_BAD_REQUEST)
+rest_framework.exceptions.ValidationError: {'error': ErrorDetail(string='Não foi encontrado nenhum usuário com este email', code=400)}
+2025-03-16 17:34:28,809 - django.request - WARNING - Bad Request: /api/erp/login
+2025-03-16 18:00:06,203 - django.request - ERROR - Internal Server Error: /api/meteor/stations-statistics
+Traceback (most recent call last):
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/office/wetterlab/meteor/views/stations_statistics.py", line 41, in get
+    stations_statistics = stations_statistics_service.handle_data()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/office/wetterlab/meteor/services/stations_statistics.py", line 49, in handle_data
+    data = self.get_data_from_db()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/office/wetterlab/meteor/services/stations_statistics.py", line 43, in get_data_from_db
+    data = list(cursor)
+           ^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/cursor.py", line 1243, in next
+    if len(self.__data) or self._refresh():
+                           ^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/cursor.py", line 1160, in _refresh
+    self.__send_message(q)
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/cursor.py", line 1039, in __send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/_csot.py", line 108, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1431, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1540, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/_csot.py", line 108, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1507, in _retry_internal
+    ).run()
+      ^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 2353, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 2483, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 2439, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/mongo_client.py", line 1322, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/topology.py", line 368, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/topology.py", line 346, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/topology.py", line 253, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/pymongo/topology.py", line 303, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 67d73bb42ee7d42dbd89e794, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-03-17 00:53:44,203 - django.request - WARNING - Not Found: /api/meteor/most-recent-period
+2025-03-17 00:54:10,271 - root - ERROR - Erro na view ModelsRefTimes - GET /api/meteor/models-ref-times: [ErrorDetail(string='Todos os parâmetros (lat, lon) são obrigatórios.', code='invalid')]
+Traceback (most recent call last):
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/.local/share/virtualenvs/wetterlab-zRFT8v2j/lib/python3.12/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/andrey/office/wetterlab/meteor/views/models_ref_times.py", line 16, in get
+    raise ValidationError("Todos os parâmetros (lat, lon) são obrigatórios.")
+rest_framework.exceptions.ValidationError: [ErrorDetail(string='Todos os parâmetros (lat, lon) são obrigatórios.', code='invalid')]
+2025-03-17 00:54:10,275 - django.request - WARNING - Bad Request: /api/meteor/models-ref-times

@@ -1,4 +1,3 @@
-from setup.db import meteor_connection
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
